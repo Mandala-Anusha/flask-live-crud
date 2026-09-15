@@ -29,6 +29,9 @@ function displayUsers(users) {
             <p>ID: ${user.id}</p>
             <p>Username: ${user.username}</p>
             <p>Email: ${user.email}</p>
+            <button onclick="editUser(${user.id}, '${user.username}', '${user.email}')">
+                Edit
+            </button>
             <hr>
         `;
 
@@ -37,3 +40,38 @@ function displayUsers(users) {
 }
 
 getUsers();
+document.getElementById("userForm").addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const username = document.getElementById("username").value;
+    const email = document.getElementById("email").value;
+
+    try {
+        const response = await fetch(API_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                username: username,
+                email: email
+            })
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            alert("User added successfully!");
+
+            document.getElementById("userForm").reset();
+
+            getUsers();
+        } else {
+            alert(result.message);
+        }
+
+    } catch (error) {
+        console.error("Error:", error);
+        alert("Failed to add user");
+    }
+});
